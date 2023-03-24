@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "StreamChatReader": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}
