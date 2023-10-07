@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StreamChatReader", "StreamC
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StreamChatReader.Test", "StreamChatReader.Test\StreamChatReader.Test.csproj", "{254C5441-814F-4A01-8DD2-B1D0A30CD210}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightSharp", "E:\Documents\GitHub\UltralightSharp\UltralightSharp\UltralightSharp.csproj", "{79AF1E95-2EB7-45AA-B2F6-CFAA78C4D770}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,10 +21,6 @@ Global
 		{254C5441-814F-4A01-8DD2-B1D0A30CD210}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{254C5441-814F-4A01-8DD2-B1D0A30CD210}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{254C5441-814F-4A01-8DD2-B1D0A30CD210}.Release|Any CPU.Build.0 = Release|Any CPU
-		{79AF1E95-2EB7-45AA-B2F6-CFAA78C4D770}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{79AF1E95-2EB7-45AA-B2F6-CFAA78C4D770}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{79AF1E95-2EB7-45AA-B2F6-CFAA78C4D770}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{79AF1E95-2EB7-45AA-B2F6-CFAA78C4D770}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

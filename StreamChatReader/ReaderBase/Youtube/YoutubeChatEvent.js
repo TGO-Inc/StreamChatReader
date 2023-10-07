@@ -137,6 +137,7 @@
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+/*
 var tryBrowserIndependentExecution = async function () {
     // window found & ready?
     if (!window || !window.document || window.document.readyState != "complete") {
@@ -159,3 +160,5 @@ var tryBrowserIndependentExecution = async function () {
 }
 
 tryBrowserIndependentExecution();
+*/
+injectScript();

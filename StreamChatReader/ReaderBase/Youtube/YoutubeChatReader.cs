@@ -11,8 +11,8 @@ using System.Runtime.InteropServices;
 using Microsoft.Win32.SafeHandles;
 using System.ComponentModel;
 using System.Threading;
-using UltralightSharp.Safe;
 using System.Net.NetworkInformation;
+using PuppeteerSharp;
 
 namespace StreamingServices.Youtube
 {
@@ -26,18 +26,17 @@ namespace StreamingServices.Youtube
         #endregion
 
         #region BrowserContext
-        private readonly DirectoryInfo CachePath;
-        private readonly string BaseDirectory = new Uri(Environment.CurrentDirectory).LocalPath;
         private readonly System.Timers.Timer MessageTimer;
         private static readonly string BaseUrl = $"https://www.youtube.com/live_chat?is_popout=1&v=";
         private readonly string JavaScript = string.Empty;
         private bool StreamLinked = false;
-        private readonly ThreadSafeView Page;
+        private readonly IBrowser StreamBrowser;
+        private readonly IPage StreamPage;
         #endregion
 
         #region ClassContext
-        private void OnChatEvent(ChatEventArgs e) => Task.Run(()=>ChatEvent?.Invoke(e));
-        private void OnChatLoaded(ChatLoadedArgs e) => Task.Run(()=>ChatLoaded?.Invoke(e));
+        private void OnChatEvent(ChatEventArgs e) => Task.Run(() => ChatEvent?.Invoke(e));
+        private void OnChatLoaded(ChatLoadedArgs e) => Task.Run(() => ChatLoaded?.Invoke(e));
         #endregion
 
         #region Initialize
@@ -63,37 +62,46 @@ namespace StreamingServices.Youtube
                         this.JavaScript = reader.ReadToEnd();
             }
 
-            // Find Cache Directory
-            do this.CachePath = new(Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString()));
-            while (this.CachePath.Exists || File.Exists(this.CachePath.FullName));
-            
-            Path.Combine(BaseDirectory, "resources");
-            // stuff
-            this.Page = new(1, 1, false)
+            // Get the first available browser
+            var (pathFound, (browserType, browserPath)) = BrowserLocator.GetFirstAvailableBrowser();
+
+            // Browser launch options
+            var launchOptions = new LaunchOptions
             {
-                BaseDirectory= this.BaseDirectory,
-                CachePath= CachePath.CreateSubdirectory("Cache").FullName,
-                LogFileName="headless-log.txt",
-                ResourcePath= Path.Combine(BaseDirectory, "resources"),
-                SessionName="StreamSession"
+                Headless = true,
+                ExecutablePath = browserPath,
+                Browser = browserType
             };
-            this.Page.RunAsync();
+
+            // If no browser is found on the system, PuppeteerSharp will download the default (Chromium)
+            this.StreamBrowser = Puppeteer.LaunchAsync(launchOptions).GetAwaiter().GetResult();
+            this.StreamPage = this.StreamBrowser.PagesAsync().GetAwaiter().GetResult().First();
         }
         #endregion
 
         #region PageThread
         private void LoadStream()
         {
-            this.Page!.LoadUrl(BaseUrl + this.StreamId);
-            this.Page?.EvaluateScript(this.JavaScript, (string ret, string exception) =>
-            {
-                this.StreamLinked = true;
-                this.OnChatLoaded(new ChatLoadedArgs());
-            });
+            Task.Run(LoadStreamAsync);
+        }
+        private async Task LoadStreamAsync()
+        {
+            string defaultChromeUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"; // Replace with your actual user agent
+            await this.StreamPage.SetUserAgentAsync(defaultChromeUserAgent);
+
+            await this.StreamPage.GoToAsync(BaseUrl + this.StreamId);
+
+            string result = await this.StreamPage.EvaluateExpressionAsync<string>(this.JavaScript);
+
+            // Check the result or handle any exceptions if needed
+            // For example, if result contains some specific value or if there's an exception, handle it accordingly
+
+            this.StreamLinked = true;
+            this.OnChatLoaded(new ChatLoadedArgs());
         }
         private void ReadStream()
         {
-            if(!this.MessageTimer.Enabled)
+            if (!this.MessageTimer.Enabled)
                 this.MessageTimer.Start();
         }
         #endregion
@@ -101,7 +109,7 @@ namespace StreamingServices.Youtube
         #region ChatControl
         public void StartReadingChat()
         {
-            if(!this.StreamLinked)
+            if (!this.StreamLinked)
                 LoadStream();
             ReadStream();
         }
@@ -117,27 +125,28 @@ namespace StreamingServices.Youtube
         }
         public void StopReadingChat()
         {
-            if(this.MessageTimer.Enabled)
+            if (this.MessageTimer.Enabled)
                 this.MessageTimer.Stop();
         }
-        private void GetMessages(object? sender, ElapsedEventArgs e)
+        private async void GetMessages(object? sender, ElapsedEventArgs e)
         {
-            this.Page?.EvaluateScript("window.GetMessageQueue();", (string output, string exception) =>
+            try
             {
-                if (output.Length > 2 && exception.Length == 0)
+                string output = await this.StreamPage.EvaluateExpressionAsync<string>("window.GetMessageQueue();");
+                Debug.WriteLine(output);
+                if (output.Length > 2)
                 {
                     foreach (JObject jobj in JArray.Parse(output).Cast<JObject>())
                     {
                         var obj = new ChatEventArgs(jobj);
-
                         this.OnChatEvent(obj);
                     }
                 }
-                else if (exception.Length > 2)
-                {
-                    Debug.WriteLine(exception);
-                }
-            });
+            }
+            catch (PuppeteerException ex)
+            {
+                Debug.WriteLine(ex.ToString());
+            }
         }
         #endregion
 
@@ -148,13 +157,11 @@ namespace StreamingServices.Youtube
         private readonly SafeHandle _safeHandle = new SafeFileHandle(IntPtr.Zero, true);
         ~YoutubeChatReader()
         {
-            this.CachePath.Delete(true);
             this.Dispose(false);
         }
         public void Dispose()
         {
             GC.SuppressFinalize(this);
-            this.CachePath.Delete(true);
             this.Dispose(true);
             GC.ReRegisterForFinalize(this);
         }

@@ -16,11 +16,18 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <Compile Remove="runtimes\**" />
+      <EmbeddedResource Remove="runtimes\**" />
+      <None Remove="runtimes\**" />
+    </ItemGroup>
+
+    <ItemGroup>
       <EmbeddedResource Include="ReaderBase\Youtube\YoutubeChatEvent.js" />
     </ItemGroup>
 	
     <ItemGroup>
         <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+        <PackageReference Include="PuppeteerSharp" Version="12.0.0" />
     </ItemGroup>
 
 	<Choose>
@@ -44,53 +51,5 @@
 	<Target Name="CheckRuntimeIdentifier" BeforeTargets="Build" Condition="'$(RuntimeIdentifier)'==''">
 		<Error Text="RuntimeIdentifier property not set." />
 	</Target>
-
-	<ItemGroup>
-		<ProjectReference Include="E:/Documents/GitHub/UltralightSharp/UltralightSharp/UltralightSharp.csproj">
-			<!--
-			<ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-			<ExcludeAssets>all</ExcludeAssets>
-			-->
-		</ProjectReference>
-		<ProjectReference Include="E:\Documents\GitHub\UltralightSharp\UltralightSharp.Core\UltralightSharp.Core.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="runtimes\win-x64\native\" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <None Include="E:\Documents\GitHub\UltralightSharp\UltralightSharp.Core.WinX64\runtimes\win-x64\native\AppCore.dll" Link="runtimes\win-x64\native\AppCore.dll" />
-	  <None Include="E:\Documents\GitHub\UltralightSharp\UltralightSharp.Core.WinX64\runtimes\win-x64\native\icudt63.dll" Link="runtimes\win-x64\native\icudt63.dll" />
-	  <None Include="E:\Documents\GitHub\UltralightSharp\UltralightSharp.Core.WinX64\runtimes\win-x64\native\icuin63.dll" Link="runtimes\win-x64\native\icuin63.dll" />
-	  <None Include="E:\Documents\GitHub\UltralightSharp\UltralightSharp.Core.WinX64\runtimes\win-x64\native\icuuc63.dll" Link="runtimes\win-x64\native\icuuc63.dll" />
-	  <None Include="E:\Documents\GitHub\UltralightSharp\UltralightSharp.Core.WinX64\runtimes\win-x64\native\Ultralight.dll" Link="runtimes\win-x64\native\Ultralight.dll" />
-	  <None Include="E:\Documents\GitHub\UltralightSharp\UltralightSharp.Core.WinX64\runtimes\win-x64\native\UltralightCore.dll" Link="runtimes\win-x64\native\UltralightCore.dll" />
-	  <None Include="E:\Documents\GitHub\UltralightSharp\UltralightSharp.Core.WinX64\runtimes\win-x64\native\WebCore.dll" Link="runtimes\win-x64\native\WebCore.dll" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <None Update="runtimes\win-x64\native\AppCore.dll">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </None>
-	  <None Update="runtimes\win-x64\native\icudt63.dll">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </None>
-	  <None Update="runtimes\win-x64\native\icuin63.dll">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </None>
-	  <None Update="runtimes\win-x64\native\icuuc63.dll">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </None>
-	  <None Update="runtimes\win-x64\native\Ultralight.dll">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </None>
-	  <None Update="runtimes\win-x64\native\UltralightCore.dll">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </None>
-	  <None Update="runtimes\win-x64\native\WebCore.dll">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </None>
-	</ItemGroup>
 	
 </Project>

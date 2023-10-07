@@ -20,7 +20,7 @@ void ChatReader_ChatEvent(ChatEventArgs e)
     Console.WriteLine(e.Message);
 }
 
-ChatReader.AddYoutubeStream("bDeysRZ3PJI");
+ChatReader.AddYoutubeStream("etyCb38ag-s");
 
 while(true)
     Console.ReadKey();
